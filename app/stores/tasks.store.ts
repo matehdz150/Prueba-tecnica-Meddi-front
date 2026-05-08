@@ -112,7 +112,8 @@ export const useTasksStore = defineStore("tasks", () => {
       const createdTask = await tasksService.create(task);
 
       // agregamos la task localmente
-      tasks.value.unshift(createdTask);
+      // refrescamos tasks reales
+      await fetchTasks();
 
       // actualizamos stats
       await fetchStats();

@@ -11,7 +11,6 @@ import {
 } from "lucide-vue-next";
 
 import {
-  priorityLabels,
   statusLabels,
 } from "~/lib/utils";
 
