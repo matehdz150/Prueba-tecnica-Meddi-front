@@ -1,6 +1,10 @@
 import type { ClassValue } from "clsx"
 import { clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import type {
+  Priority,
+  Status,
+} from "~/types/task.types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -20,3 +24,21 @@ export function translateDay(day: string) {
 
   return daysMap[day] || day;
 }
+
+
+export const priorityLabels: Record<
+  Priority,
+  string
+> = {
+  HIGH: "Alta",
+  MEDIUM: "Media",
+  LOW: "Baja",
+};
+
+export const statusLabels: Record<
+  Status,
+  string
+> = {
+  COMPLETED: "Completada",
+  PENDING: "Pendiente",
+};

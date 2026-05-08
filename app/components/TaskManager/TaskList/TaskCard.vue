@@ -10,6 +10,11 @@ import {
   Trash2,
 } from "lucide-vue-next";
 
+import {
+  priorityLabels,
+  statusLabels,
+} from "~/lib/utils";
+
 import { useTasksStore } from "~/stores/tasks.store";
 
 // props
@@ -80,7 +85,7 @@ const handleEdit = (id: string) => {
       <div
         class="rounded-full bg-black px-2 py-1 text-[10px] font-medium text-white"
       >
-        {{ task.status }}
+        {{ statusLabels[task.status] }}
       </div>
 
       <div class="relative">

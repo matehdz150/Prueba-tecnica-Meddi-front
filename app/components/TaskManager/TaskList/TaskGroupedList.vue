@@ -2,6 +2,9 @@
 import type {
   GroupedTasks,
 } from "~/types/task.types";
+import {
+  priorityLabels,
+} from "~/lib/utils";
 
 //Definimos propiedad del componente para recibir las GroupedTasks
 defineProps<{
@@ -20,7 +23,7 @@ defineProps<{
       <!-- Header -->
       <div class="mb-2 flex items-center justify-between">
         <h3 class="text-sm font-semibold text-black">
-          {{ priority }}
+          {{ priorityLabels[priority] }}
         </h3>
 
         <span class="text-xs text-black/40">
