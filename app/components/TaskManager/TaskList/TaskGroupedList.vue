@@ -38,7 +38,6 @@ defineProps<{
           v-for="task in items"
           :key="task._id"
           :task="task"
-          @deleted="$emit('deleted')"
         />
       </div>
 

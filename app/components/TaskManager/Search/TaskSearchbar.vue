@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import type { Task } from "~/types/task.types";
-
 import { Search } from "lucide-vue-next";
-
-import { tasksService } from "~/services/tasks.service";
 
 import {
   Popover,
@@ -11,62 +7,27 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { useTasksStore } from "~/stores/tasks.store";
+
+//Definimos props del componente
 const props = defineProps<{
   placeholder?: string;
-}>(); //definimos propiedades del componente, solamente recibe el placeholder
+}>();
 
-//Creamos el model para que el componente padre pueda comunicarse con el searchbar
-const model = defineModel<string>();
+//Traemos el store
+const store = useTasksStore();
 
-//Creamos estado de carga
-const loading = ref(false);
+//Creamos el model
+const model = ref("");
 
-//Creamos el estado de tareas
-const tasks = ref<Task[]>([]);
-
-//estado para saber si esta abierto el contenido del searchbar
-const open = ref(false);
-
-//Funcion para traer las tareas usando el tasksService
-async function searchTasks() {
-  try {
-    //Verifica si el modelo esta vacio, si esta vacio limpiamos todo y cerramos el popover
-    if (!model.value?.trim()) {
-      tasks.value = [];
-
-      open.value = false;
-
-      return;
-    }
-    //Comenzamos a cargar las tasks, el valor para mostrar que esta cargando se activa
-    loading.value = true;
-
-    //Obtenemos las tasks solamente si el input no esta vacio con el filtro de search para obtener por nombre las tasks
-    const response = await tasksService.getAll({
-      search: model.value,
-    });
-
-    //Guardamos las tasks en el estado para luego mostrarlas en el contenido del searchbar
-    tasks.value = response;
-
-    //Abrimos el contenido del searchbar
-    open.value = true;
-  } catch (error) {
-    console.error(error);
-  } finally {
-    //siempre se ejecuta, dejamos de mostrar el loading
-    loading.value = false;
-  }
-}
-//observador en el model, cada que cambia volvemos a ejecutar el searchtask. 
-//Esto hace que se haga la busqueda cada que modificamos el input
-watch(model, () => {
-  searchTasks();
+//Observamos el model, cuando haya cambios se hace refetch con pinia
+watch(model, (value) => {
+  store.setSearch(value);
 });
 </script>
 
 <template>
-  <Popover :open="open">
+  <Popover :open="!!model">
     <PopoverTrigger as-child>
       <div class="flex items-center gap-2">
         <div
@@ -74,10 +35,10 @@ watch(model, () => {
         >
           <Search class="h-5 w-5 text-black" />
         </div>
+
         <div
           class="flex h-11 flex-1 items-center rounded-xl border border-black/50 bg-transparent px-4"
         >
-        <!-- definimos el input como el modelo -->
           <input
             v-model="model"
             :placeholder="props.placeholder ?? 'Buscar tareas'"
@@ -86,13 +47,15 @@ watch(model, () => {
         </div>
       </div>
     </PopoverTrigger>
-    <!-- Si open es true mostramos el popover con el contenido de las tasks -->
+
     <PopoverContent
       align="start"
       class="mt-2 w-100 rounded-2xl border-black/10 bg-white p-2"
     >
-      <!-- Mostramos resultados de la busqueda, recibe las tasks y el estado de loading para manejarlo -->
-      <TaskSearchResults :tasks="tasks" :loading="loading" />
+      <TaskSearchResults
+        :tasks="store.tasks"
+        :loading="store.loading"
+      />
     </PopoverContent>
   </Popover>
 </template>

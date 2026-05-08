@@ -1,66 +1,71 @@
-<!-- TaskDay.vue -->
-
 <script setup lang="ts">
 import type { Task } from "~/types/task.types";
-
 import { tasksService } from "~/services/tasks.service";
+import { useTasksStore } from "~/stores/tasks.store";
 
-
-//Definimos propiedades del componente para recibir la fecha
-const props = defineProps<{
-  date: string;
-}>();
+//Usamos el store global de tasks
+const tasksStore = useTasksStore();
 
 //Estado para guardar las tareas
 const tasks = ref<Task[]>([]);
 
-//Estado para el manejo de la carga de datps
+//Estado para el manejo de la carga de datos
 const isLoading = ref(false);
 
 //Formateamos la fecha para poderla mostrar en la pantalla, es solo para mostrarla bonita
 const formattedDate = computed(() => {
-  if (!props.date) {
+  //Verificamos que exista la fecha seleccionada
+  if (!tasksStore.selectedDate) {
     return "";
   }
+
   //La formateamos en formato es-MX
   return new Intl.DateTimeFormat("es-MX", {
     day: "numeric",
     month: "long",
-  }).format(new Date(props.date)); //creamos la fecha de string a Date
+  }).format(
+    new Date(tasksStore.selectedDate),
+  ); //creamos la fecha de string a Date
 });
 
 //Cargamos las tasks
 const loadTasks = async () => {
   try {
     //Verificamos que existan las tasks
-    if (!props.date) {
+    if (!tasksStore.selectedDate) {
       tasks.value = [];
 
       return;
     }
+
     //Comenzamos estado de carga para mostrar
     isLoading.value = true;
 
-    //Creamos una fecha con la fecha del estado 
-    const start = new Date(props.date);
+    //Creamos una fecha con la fecha del estado
+    const start = new Date(
+      tasksStore.selectedDate,
+    );
 
     //convertimos la fecha al inicio del dia
     start.setHours(0, 0, 0, 0);
 
     //Creamos la fecha de final
-    const end = new Date(props.date);
+    const end = new Date(
+      tasksStore.selectedDate,
+    );
 
     //La convertimos al final del día: 23:59:59
     end.setHours(23, 59, 59, 999);
 
-    //Las conversiones de fecha son solamente para que el filtro funcione, ya que se usan dos fechas para comparar
+    //Las conversiones de fecha son solamente para que el filtro funcione,
+    //ya que se usan dos fechas para comparar
+
     //Obtenemos las tasks entre el rango de fechas y de manera ascendente
     tasks.value = await tasksService.getAll({
       startDate: start.toISOString(),
       endDate: end.toISOString(),
       sort: "asc",
     });
-
   }
   catch (error) {
     console.error(error);
@@ -69,9 +74,10 @@ const loadTasks = async () => {
     isLoading.value = false;
   }
 };
-//Observamos si cambia la fecha se hace el el load de tasks de nuevo
+
+//Observamos si cambia la fecha se hace el load de tasks de nuevo
 watch(
-  () => props.date,
+  () => tasksStore.selectedDate,
   () => {
     loadTasks();
   },

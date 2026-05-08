@@ -10,22 +10,17 @@ import {
   Trash2,
 } from "lucide-vue-next";
 
-import { tasksService } from "@/services/tasks.service";
+import { useTasksStore } from "~/stores/tasks.store";
 
-//Definimos propiedad del componente para recibir la task
+// props
 defineProps<{
   task: Task;
 }>();
 
-//Evento personalizado para poder comunicar al padre que una task fue borrada
-const emit = defineEmits<{
-  deleted: [];
-}>();
+const store = useTasksStore();
 
-//Estado del dropdown de editar/borrar task
 const isDropdownOpen = ref(false);
 
-//Dependiendo de la prioridad de cada task, se va a mostrar de manera diferente cada uno
 const priorityConfig = {
   HIGH: {
     icon: ArrowUp,
@@ -43,19 +38,10 @@ const priorityConfig = {
   },
 };
 
-//Manejamos el fetch para borrar la task, el evento emit avisa al padre que debe de dejar de renderizarla
 const handleDelete = async (id: string) => {
-  try {
-    await tasksService.delete(id);
-
-    emit("deleted");
-  } catch (error) {
-    console.error(error);
-  }
+  await store.deleteTask(id);
 };
 
-
-//Simplemente redirigimos a la pagina de edicion de la task
 const handleEdit = (id: string) => {
   navigateTo(`/taskManager/edit/${id}`);
 };

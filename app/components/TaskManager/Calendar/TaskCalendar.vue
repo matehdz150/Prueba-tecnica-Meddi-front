@@ -1,5 +1,3 @@
-<!-- TaskCalendar.vue -->
-
 <script setup lang="ts">
 import {
   ChevronLeft,
@@ -7,47 +5,50 @@ import {
 } from "lucide-vue-next";
 
 import { Calendar } from "@/components/ui/calendar";
+import { useTasksStore } from "~/stores/tasks.store";
 
-//definimos el modelo, para poder comunicar con el componente padre la fecha
-const modelValue = defineModel<string>({
-  required: true,
-});
+//usamos taskstore
+const store = useTasksStore();
 
-//Creamos estado de la fecha
+//Estado interno del calendar
 const internalDate = ref();
 
+//Observamos cambios del calendario
 watch(
-  //Observador para detectar cambios en la fecha seleccionada del calendario
   internalDate,
-  (value: any) => {
+  (value) => {
     if (!value) {
       return;
     }
 
-    //Convertimos la fecha del calendario a un objeto Date
-    const jsDate = new Date(
-      value.year,
-      value.month - 1,
-      value.day +1,
-    );
+    const year = value.year;
 
-    //Convertimos la fecha a formato YYYY-MM-DD
-    modelValue.value =
-      jsDate.toISOString().split("T")[0] || "";
+    const month = String(
+      value.month,
+    ).padStart(2, "0");
+
+    const day = String(
+      value.day,
+    ).padStart(2, "0");
+
+    //Actualizamos fecha global formateado manualmente
+    store.setSelectedDate(
+      `${year}-${month}-${day}`,
+    );
   },
   {
-    immediate: true, //inmediatamente al renderizal el componente
+    immediate: true,
   },
 );
 
-//Creamos la fecha actual si no existe
+//Fecha actual
 const currentDate = computed(() => {
-  return modelValue.value
-    ? new Date(modelValue.value)
+  return store.selectedDate
+    ? new Date(store.selectedDate)
     : new Date();
 });
 
-//creamos el mes formateado a espanol mexico
+//Mes formateado
 const formattedMonth = computed(() => {
   return currentDate.value.toLocaleDateString(
     "es-MX",
@@ -58,7 +59,7 @@ const formattedMonth = computed(() => {
   );
 });
 
-//Regresar al mes anterior, creamos objeto date un mes anterior
+//Mes anterior
 const previousMonth = () => {
   const newDate = new Date(
     currentDate.value.getFullYear(),
@@ -66,12 +67,12 @@ const previousMonth = () => {
     1,
   );
 
-  //Actualizamos la fecha seleccionada.
-  modelValue.value =
-    newDate.toISOString().split("T")[0] || "";
+  store.setSelectedDate(
+    newDate.toISOString().split("T")[0] || "",
+  );
 };
 
-//Avanzamos al siguiente mes, sumamos un mes
+//Mes siguiente
 const nextMonth = () => {
   const newDate = new Date(
     currentDate.value.getFullYear(),
@@ -79,8 +80,9 @@ const nextMonth = () => {
     1,
   );
 
-  modelValue.value =
-    newDate.toISOString().split("T")[0] || "";
+  store.setSelectedDate(
+    newDate.toISOString().split("T")[0] || "",
+  );
 };
 </script>
 

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 
+
 import {
   Popover,
   PopoverContent,
@@ -32,6 +33,9 @@ import {
 } from "lucide-vue-next";
 
 const route = useRoute();
+
+//traemos el store de tasks
+const store = useTasksStore();
 
 //Obtenemos el id de la task a editar
 const taskId = route.params.id as string;
@@ -111,7 +115,7 @@ async function updateTask() {
     loading.value = true;
 
     //Actualizamos la task
-    await tasksService.update(taskId, {
+    await store.updateTask(taskId, {
       title: form.title,
       description: form.description,
       priority: form.priority,

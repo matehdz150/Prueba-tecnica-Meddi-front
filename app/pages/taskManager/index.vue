@@ -1,9 +1,5 @@
 <script setup lang="ts">
 import { Plus } from "lucide-vue-next";
-//Estadp de la fecha del calendario, sirve para manejar el TaskDay y el TaskCalendar, sincronizar el día seleccionado y las tareas mostradas
-const selectedDate = ref<string>(
-  new Date().toISOString().split("T")[0] || "",
-);
 </script>
 
 <template>
@@ -29,8 +25,8 @@ const selectedDate = ref<string>(
           </Button>
         </div>
         <!-- Calendario y tasks del dia seleccionado, comparten estado de la fecha, manejo de fechas con string-->
-        <TaskCalendar v-model="selectedDate" />
-        <TaskDay :date="selectedDate" />
+        <TaskCalendar/>
+        <TaskDay/>
       </div>
     </div>
   </GPageContainer>

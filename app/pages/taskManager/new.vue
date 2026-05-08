@@ -23,6 +23,9 @@ import {
 
 import { LoaderCircle, ArrowLeft, CalendarIcon } from "lucide-vue-next";
 
+//Store de tasks
+const store = useTasksStore();
+
 //Estado de carga
 const loading = ref(false);
 
@@ -63,30 +66,25 @@ watch(selectedDate, (value) => {
     `${year}-${month}-${day}`;
 });
 
-//fetch para crear la tarea
+//Crear task usando Pinia
 async function createTask() {
   try {
-    //comienza a cargar
-    loading.value = true;
 
-    //Hacemos el fetch con las propiedades del form
-    const createdTask = await tasksService.create({
+    await store.createTask({
       title: form.title,
       description: form.description,
       priority: form.priority,
       status: form.status,
-      dueDate: form.dueDate || undefined,
+      dueDate:
+        form.dueDate || undefined,
     });
-
-    console.log(createdTask);
-
-    //Si todo sale bien=, redirigimos
     navigateTo("/taskManager");
-  } catch (error) {
-    console.error(error);
-  } finally {
-    loading.value = false;
   }
+
+  catch (error) {
+    console.error(error);
+  }
+
 }
 </script>
 

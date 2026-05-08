@@ -1,45 +1,27 @@
 <script setup lang="ts">
-import type { TaskStats } from "~/types/task.types";
+import { useTasksStore } from "~/stores/tasks.store";
 
-import { tasksService } from "~/services/tasks.service";
+//Traemos el store
+const store = useTasksStore();
 
-//Creamos el estado de estadisticas, traemos el type de como van a llegar las estadisticas
-const stats = ref<TaskStats | null>(null);
-
-//Hacemos la peticion de las estadisticas
-async function fetchStats() {
-  try {
-    stats.value = await tasksService.getStats();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-//hacemos la peticion de las estadisticas ya que se renderizo el componente
+//t=obtenemos las estadisticas despues de renderizar el componente con pina
 onMounted(() => {
-  fetchStats();
+  store.fetchStats();
 });
 </script>
 
 <template>
-  <!-- Usamos flex para dividir en dos rows y dos columnas. Cada chart recibe las estadisticas y las muestra -->
   <div class="mt-6 flex flex-col gap-4">
-    <!-- Primera row-->
     <div class="flex gap-4">
-      <!-- 40% -->
-      <LeftChart v-if="stats" :stats="stats" />
+      <LeftChart v-if="store.stats" :stats="store.stats" />
 
-      <!-- 60% -->
-      <RightChart v-if="stats" :stats="stats" />
+      <RightChart v-if="store.stats" :stats="store.stats" />
     </div>
 
-    <!-- Segunda row -->
     <div class="flex gap-4">
-      <!-- 50% -->
-      <LeftBottomChart v-if="stats" :stats="stats" />
+      <LeftBottomChart v-if="store.stats" :stats="store.stats" />
 
-      <!-- 50% -->
-      <RightBottomChart v-if="stats" :stats="stats" />
+      <RightBottomChart v-if="store.stats" :stats="store.stats" />
     </div>
   </div>
 </template>
